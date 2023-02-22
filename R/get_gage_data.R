@@ -1,5 +1,5 @@
 # Angus Watters
-# Get Observed streamflows data
+# Get Observed streamflows data + boatable days
 
 # load libraries
 library(cdssr)
@@ -8,7 +8,7 @@ library(dplyr)
 source("R/utils.R")
 
 # save output path
-save_path <- "data/streamflow/observed/discharge.csv"
+save_path <- "data/streamflow/observed/boatable_flows.csv"
 
 # check if streamflow discharge daily data already exists, otherwise get data
 if(file.exists(save_path)) {
@@ -19,47 +19,13 @@ if(file.exists(save_path)) {
   
 } else {
   
-  # table of gages
-  gage_df <- 
-    gage_tbl()  %>% 
-    dplyr::distinct(river, gage_id, gage_name, source) 
+  flow_df <- get_flows(
+                  gage_table = gage_tbl(),
+                  start_date = "1980-01-01",
+                  end_date   = Sys.Date()
+                  )
   
-  # rm(i, flow_df)
-  flow_df <- lapply(1:nrow(gage_df), function(i) {
-  
-    message(paste0(
-      i, "/", nrow(gage_df),
-      "\nRiver: ",  gage_df$river[i], 
-      "\nUSGS ID: ",  gage_df$gage_id[i],
-      "\nAbbrev: ",  gage_df$gage_name[i],
-      "\n--------------------------------------------------"
-    ))
-    
-    
-    if(gage_df$source[i] == "USGS") {
-      
-      sw <- cdssr::get_sw_ts(
-        usgs_id     = gage_df$gage_id[i],  
-        start_date  = '1980-01-01',
-        end_date    = Sys.Date()
-      )
-      
-      } else {
-        
-        sw <- cdssr::get_sw_ts(
-          abbrev      = gage_df$gage_name[i],  
-          start_date  = '1980-01-01',
-          end_date    = Sys.Date()
-        )
-        
-      }
-    
-    sw
-      
-  
-  }) %>% 
-    dplyr::bind_rows()
-  
+  # save out CSV
   readr::write_csv(flow_df, save_path)
   
 }
