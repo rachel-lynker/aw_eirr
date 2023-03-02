@@ -1,6 +1,10 @@
+# library(dplyr)
+# df <- gage_tbl()
+# readr::write_csv(df, "C:/Users/angus/OneDrive/Desktop/github/leetcode/gage_tbl.csv")
+
 #' Summary table of Gage info and flow threshold values
 #'
-#' @return dataframe containing relevent river reaches, associated USGS IDs and other information
+#' @return dataframe containing relevant river reaches, associated USGS IDs and other information
 #' @export
 #'
 #' @examples
@@ -77,13 +81,13 @@ gage_tbl <- function() {
       uid = dplyr::case_when(
         is.na(abbrev)  ~ gage_id,
         is.na(gage_id) ~ abbrev,
-        TRUE             ~ abbrev
+        TRUE           ~ abbrev
       )
     ) %>% 
     dplyr::relocate(river, reach, abbrev, gage_id, uid, desc)
   
+  
 }
-
 
 #' Add boatable days column to streamflow dataframe 
 #'
@@ -164,4 +168,18 @@ get_flows <- function(
     
   }) %>% 
     dplyr::bind_rows()
+}
+
+# Roaring fork RICD CFS management plan flow/date table
+rf_ricd <- function() {
+  
+  data.frame(
+    start_mon  = c("mar", "apr", "may", "may", "july", "august", "nov"),
+    end_mon    = c("apr", "apr", "may", "july", "july", "oct", "nov"),
+    start_day  = c(15, 15, 1, 15, 15, 1, 1),
+    end_day    = c(14, 30, 14, 14, 31, 31, 30),
+    start_date = c("03-15", "04-15", "05-01", "05-15", "07-15", "08-01", "11-01"),
+    end_date   = c("04-14", "04-30", "05-14", "07-14", "07-31", "10-31", "11-30"),
+    flow_rate  = c(230, 310, 575, 1000, 575, 310, 230)
+  )
 }
