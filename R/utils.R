@@ -184,6 +184,12 @@ rf_ricd <- function() {
   )
 }
 
+# RICD rules
+# 10 total days
+# 1 event in May lasting (2 days per event,  580 CFS per day = 2*580 CFS = 1160 CFS over 2 days)
+# 2 events in June (4 days per event, 400 CFS per day = 4*400 CFS = 1600 CFS over 4 days)
+
+
 # impute missing values w/ mean
 impute_mean <- function(x) {
   replace(x, is.na(x), mean(x, na.rm = TRUE))
