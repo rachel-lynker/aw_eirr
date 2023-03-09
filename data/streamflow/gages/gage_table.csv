@@ -1,0 +1,14 @@
+river,reach,abbrev,gage_id,uid,desc,min_threshold,max_threshold,source
+Roaring Fork,Black Bridge to Veltus Park (Cemetery),ROAGLECO,09085000,ROAGLECO,"Roaring Fork River at Glenwood Springs, CO",200,10000,USGS
+Roaring Fork,Basalt to Carbondale,ROAEMMCO,09081000,ROAEMMCO,"Roaring Fork near Emma, CO",200,1500,USGS
+Roaring Fork,Lower Woody Creek Bridge to Rte. 82 Bridge,NA,09076300,09076300,"Roaring Fork River Blw Maroon Creek Nr Aspen, CO",200,1400,USGS
+Roaring Fork,Slaughterhouse,NA,09076300,09076300,"Roaring Fork River Blw Maroon Creek Nr Aspen, CO",200,2700,USGS
+Roaring Fork,Weller Lake to Difficult CG,ROADIFCO,09073300,ROADIFCO,"Roaring Fork River Ab Difficult Cr Nr Aspen, CO",100,1000,USGS
+Yampa,Yampa River Park to Transit Center,YAMSTECO,09239500,YAMSTECO,"Yampa River at Steamboat Springs, CO",700,5000,USGS
+Yampa,Transit Center to Pump Station,YAMELKCO,09244490,YAMELKCO,"Yampa River above Elkhead Creek near Hayden, CO",500,5000,USGS
+Yampa,Little Yampa Canyon,YAMCRACO,09247600,YAMCRACO,"Yampa River below Craig, CO",1100,10000,USGS
+Yampa,Cross Mountain Gorge - 85 Rd to Deer Lodge Park Rd,YAMAYBCO,09251000,YAMAYBCO,"Yampa River near Maybell, CO",700,5000,USGS
+Yampa,Deerlodge Park to Echo Park,YAMDEECO,09260050,YAMDEECO,"Yampa River at Deerlodge Park, CO",1300,25000,USGS
+Cache La Poudre,Filter Plant,CLAFTCCO,06752000,CLAFTCCO,CLAFTCCO,522.7273,1000000,USGS
+Cache La Poudre,Poudre Whitewater Park,CLAFORCO,06752260,CLAFORCO,CLAFORCO,354.797,1000000,USGS
+Cache La Poudre,Big South,LAPLODCO,NA,LAPLODCO,LAPLODCO,170.1005,1000000,CDSS
