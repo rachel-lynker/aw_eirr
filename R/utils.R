@@ -15,7 +15,8 @@ gage_tbl <- function() {
             "Roaring Fork",
             "Roaring Fork",
             "Roaring Fork",
-            "Roaring Fork",
+            # "Roaring Fork",
+            # "Roaring Fork",
             "Roaring Fork",
             "Yampa",
             "Yampa",
@@ -28,19 +29,25 @@ gage_tbl <- function() {
             ),
    reach = c(
      "Black Bridge to Veltus Park (Cemetery)", "Basalt to Carbondale",
-     "Lower Woody Creek Bridge to Rte. 82 Bridge", "Slaughterhouse",  "Weller Lake to Difficult CG",
+     "Lower Woody Creek Bridge to Rte. 82 Bridge/Slaughterhouse", 
+     # "Lower Woody Creek Bridge to Rte. 82 Bridge", "Slaughterhouse",  
+     "Weller Lake to Difficult CG",
      'Yampa River Park to Transit Center', "Transit Center to Pump Station",
      'Little Yampa Canyon', "Cross Mountain Gorge - 85 Rd to Deer Lodge Park Rd", 'Deerlodge Park to Echo Park',
      "Filter Plant",  "Poudre Whitewater Park", "Big South"
      ),
    abbrev = c(
-     "ROAGLECO", "ROAEMMCO", NA, NA, "ROADIFCO",
+     "ROAGLECO", "ROAEMMCO", 
+     NA, # NA, NA, 
+     "ROADIFCO",
      "YAMSTECO", "YAMELKCO", "YAMCRACO", "YAMAYBCO",
      "YAMDEECO", "CLAFTCCO", "CLAFORCO", "LAPLODCO"
    ),
   desc = c(
     "Roaring Fork River at Glenwood Springs, CO", "Roaring Fork near Emma, CO",
-    "Roaring Fork River Blw Maroon Creek Nr Aspen, CO", "Roaring Fork River Blw Maroon Creek Nr Aspen, CO", 
+    "Roaring Fork River Blw Maroon Creek Nr Aspen, CO", 
+    # "Roaring Fork River Blw Maroon Creek Nr Aspen, CO",
+    # "Roaring Fork River Blw Maroon Creek Nr Aspen, CO", 
     "Roaring Fork River Ab Difficult Cr Nr Aspen, CO",
     "Yampa River at Steamboat Springs, CO", "Yampa River above Elkhead Creek near Hayden, CO", 
     "Yampa River below Craig, CO", "Yampa River near Maybell, CO",  "Yampa River at Deerlodge Park, CO",
@@ -50,7 +57,8 @@ gage_tbl <- function() {
               "09085000",
               "09081000",
               "09076300",
-              "09076300",
+              # "09076300",
+              # "09076300",
               "09073300",
               "09239500",
               "09244490",
@@ -62,17 +70,23 @@ gage_tbl <- function() {
               NA
               ),
   min_threshold = c(
-    200, 200, 200, 200,100,
+    200, 200, 
+    200, # 200, 200,
+    100,
     700, 500, 1100, 700,1300,
     522.7273, 354.797, 170.1005
     ),
   max_threshold = c(
-    10000,1500, 1400, 2700,1000,
+    10000,1500,
+    2050, # 1400, 2700, # took the mean of these 2 values
+    1000,
     5000, 5000, 10000, 5000, 25000,
     1000000, 1000000, 1000000
   ),
   source = c(
-    "USGS","USGS", "USGS", "USGS", "USGS",
+    "USGS","USGS", 
+    "USGS", # "USGS", "USGS",
+    "USGS",
     "USGS", "USGS","USGS", "USGS", "USGS",
     "USGS", "USGS", "CDSS"
   )
@@ -98,7 +112,9 @@ gage_tbl <- function() {
 #' @export
 get_boatable_days <- function(
     df        = NULL,
-    threshold = NULL
+    threshold = NULL,
+    flow_col  = "flow",
+    boat_col  = "boat_obs"
     ) {
 
   message(paste0("calculating boatable days..."))
@@ -117,8 +133,27 @@ get_boatable_days <- function(
     
   }
   
+  # flow_col = "flow"
+  # as.vector(df[, flow_col])
+  # class(as.numeric(as.vector(df[, flow_col])))
+  # as.numeric((unlist(as.vector(df[, flow_col]))))
+  # df$flow
+  # class(df$flow)
+  
   # add boatable days tag
-  df$boatable_days <- ifelse(df$value >= min_threshold & df$value <= max_threshold, 1, 0)
+  df[[boat_col]] <- ifelse(
+                          as.numeric((unlist(as.vector(df[, flow_col])))) >= min_threshold &
+                            as.numeric((unlist(as.vector(df[, flow_col])))) <= max_threshold, 
+                          1, 
+                          0
+                        )
+  # df$boatable_days <- ifelse(
+  #                         as.numeric((unlist(as.vector(df[, flow_col])))) >= min_threshold &
+  #                           as.numeric((unlist(as.vector(df[, flow_col])))) <= max_threshold, 
+  #                           1, 
+  #                           0
+  #                         )
+  # df$boatable_days <- ifelse(df$flow >= min_threshold & df$flow <= max_threshold, 1, 0)
   
   return(df)
   
@@ -127,7 +162,8 @@ get_boatable_days <- function(
 get_flows <- function(
   gage_table = NULL,
   start_date = "1980-01-01",
-  end_date   = Sys.Date()
+  end_date   = Sys.Date(),
+  api_key    = NULL
   ) {
   
   # table of gages
@@ -135,7 +171,7 @@ get_flows <- function(
     
     gage_table <- gage_tbl() 
   }
-
+  
   # loop over each row of the gage dataframe
   flow_df <- lapply(1:nrow(gage_table), function(i) {
     
@@ -151,14 +187,29 @@ get_flows <- function(
       abbrev      = if(is.na(gage_table$abbrev[i])) { NULL } else { gage_table$abbrev[i] },
       usgs_id     = if(is.na(gage_table$gage_id[i])) { NULL } else { gage_table$gage_id[i] },
       start_date  = start_date,
-      end_date    = end_date
-    )
+      end_date    = end_date,
+      api_key     = api_key
+    ) %>% 
+      dplyr::select(station_num, abbrev, usgs_site_id, datetime, flow = value)
     
     # add unique identifer column
     sw$uid <- gage_table$uid[i]
     
+    # reorder columns
+    sw <- 
+      sw %>% 
+      dplyr::left_join(
+        dplyr::select(gage_table, uid, river),
+        by = "uid"
+      ) %>% 
+      dplyr::relocate(river, uid, station_num, abbrev, usgs_site_id, datetime, flow)
+
     # add boatable days column 
-    sw <- get_boatable_days(sw)
+    sw <- get_boatable_days(
+                          sw, 
+                          flow_col = "flow",
+                          boat_col = "boat_obs"
+                        )
     
     message(paste0(
       "--------------------------------------------------"
@@ -174,6 +225,7 @@ get_flows <- function(
 rf_ricd <- function() {
   
   data.frame(
+    order      = c(1, 2, 3, 4, 5, 6, 7),
     start_mon  = c("mar", "apr", "may", "may", "july", "august", "nov"),
     end_mon    = c("apr", "apr", "may", "july", "july", "oct", "nov"),
     start_day  = c(15, 15, 1, 15, 15, 1, 1),
@@ -189,6 +241,52 @@ rf_ricd <- function() {
 # 1 event in May lasting (2 days per event,  580 CFS per day = 2*580 CFS = 1160 CFS over 2 days)
 # 2 events in June (4 days per event, 400 CFS per day = 4*400 CFS = 1600 CFS over 4 days)
 
+# calculate RICD Management flows and boatalbe days under this scenario
+get_rf_ricd <- function(df) {
+  
+  rf <-
+    df %>% 
+    dplyr::filter(river == "Roaring Fork") %>% 
+    dplyr::mutate(
+      year  = lubridate::year(datetime),
+      month = tolower(lubridate::month(datetime, label = T)),
+      day   = lubridate::day(datetime)
+    ) %>% 
+    dplyr::group_by(usgs_site_id, year) %>% 
+    dplyr::mutate(
+      mgmt_flow = dplyr::case_when(
+        month == "mar" & day >= 15        ~ 230,
+        month == "apr" & day <= 14        ~ 230,
+        month == "apr" & day >= 15        ~ 310,
+        month == "may" & day <= 14        ~ 575,
+        month == "may" & day >= 15        ~ 1000,
+        month == "june"                   ~ 1000,
+        month == "jul" & day <= 14        ~ 1000,
+        month == "jul" & day >= 15        ~ 575,
+        month %in% c("aug", "sep", "oct") ~ 310,
+        month == "nov"                    ~ 230,
+        TRUE                              ~ NA_real_
+      ),
+      is_mgmt = dplyr::case_when(
+        !is.na(mgmt_flow)  ~ TRUE,
+        TRUE               ~ FALSE
+      ),
+      mgmt_flow = dplyr::case_when(
+        is.na(mgmt_flow) ~ flow,
+        TRUE              ~ mgmt_flow
+      )
+    ) %>% 
+    dplyr::ungroup() %>% 
+    dplyr::select(-year, -month, -day) %>% 
+    get_boatable_days(
+      flow_col = "mgmt_flow",
+      boat_col = "boat_mgmt"
+    )
+  
+  return(rf)
+  
+  
+}
 
 # impute missing values w/ mean
 impute_mean <- function(x) {

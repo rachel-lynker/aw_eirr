@@ -165,3 +165,18 @@ def get_boatable_days(
   
   return df
 
+# Roaring fork RICD CFS management plan flow/date table
+def rf_ricdf():
+  tbl = pd.DataFrame({
+    'order' :[1, 2, 3, 4, 5, 6, 7],
+    'start_mon' :["mar", "apr", "may", "may", "july", "august", "nov"],
+    'end_mon' :["apr", "apr", "may", "july", "july", "oct", "nov"],
+    'start_day' :[15, 15, 1, 15, 15, 1, 1],
+    'end_day' :[14, 30, 14, 14, 31, 31, 30],
+    'start_date' :["03-15", "04-15", "05-01", "05-15", "07-15", "08-01", "11-01"],
+    'end_date' :["04-14", "04-30", "05-14", "07-14", "07-31", "10-31", "11-30"],
+    'flow_rate' :[230, 310, 575, 1000, 575, 310, 230]
+    })
+    
+  return tbl
+

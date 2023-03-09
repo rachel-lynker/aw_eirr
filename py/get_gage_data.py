@@ -4,6 +4,9 @@ import pandas as pd
 import numpy as np
 from py import utils
 
+# save output path
+save_path = "data/streamflow/observed/boatable_flows.csv"
+
 # get gage table
 # gage_tbl = pd.read_csv("data/streamflow/gages/gage_table.csv",  dtype=str)
 
@@ -14,6 +17,8 @@ flow_df = utils.get_flows(
   end_date   = datetime.date.today().strftime("%Y-%m-%d")
   )
 
+# save data to data/streamflow/observed
+flow_df.to_csv(save_path, index=False)
 # df.loc[df["value"] >= min_threshold & df["value"] <= max_threshold, "value"]
 
 # get_boatable_days <- function(
